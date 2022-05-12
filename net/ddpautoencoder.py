@@ -8,10 +8,11 @@ from torchvision import transforms
 
 class DDPAutoEncoder(pl.LightningModule):
 
-    def __init__(self, root, batchsize, hidden_dim: int = 64):
+    def __init__(self, root, batchsize=16,lr = 1e-3):
         super().__init__()
         self.root = root
         self.batchsize = batchsize
+        self.lr = lr
         self.loss = F.mse_loss
         self.encoder = nn.Sequential(
             nn.Conv2d(3,8,kernel_size=5, padding=2), 
@@ -61,7 +62,7 @@ class DDPAutoEncoder(pl.LightningModule):
         return self.decoder(z)
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
+        optimizer = torch.optim.Adam(self.parameters(), lr=self.lr)
         return optimizer
 
     def setup(self, stage):
@@ -73,5 +74,6 @@ class DDPAutoEncoder(pl.LightningModule):
 
     def train_dataloader(self):
         return torch.utils.data.DataLoader(self.train_data,batch_size = self.batchsize,num_workers=24)
+    
     def val_dataloader(self):
         return torch.utils.data.DataLoader(self.val_data,batch_size = self.batchsize,num_workers=24)
