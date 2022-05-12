@@ -2,7 +2,9 @@ import warnings
 warnings.filterwarnings(action='ignore') 
 from pytorch_lightning import Trainer
 from net.ddpautoencoder import DDPAutoEncoder
+from util.isedoldataset import IsedolDataset
 from pytorch_lightning.loggers import WandbLogger
+from pytorch_lightning.plugins import DDPPlugin
 import torch
 import os
 import numpy as np
@@ -22,33 +24,47 @@ def get_args():
 
 	return args
 
-#get arg
-args = get_args()
-print(args)
+if __name__ == "__main__":
+	#get arg
+	args = get_args()
+	print(args)
 
-#set root
-data_path = os.path.join(args.data_path,args.name,'1')
+	#set root
+	data_path = os.path.join(args.data_path,args.name)
 
-#set logger
-wandb_logger = WandbLogger(project="multi-GPU", entity="engui")
-wandb_logger.config = args
+	#set logger
+	wandb_logger = WandbLogger(project="multi-GPU", entity="engui")
+	wandb_logger.config = args
 
-#training
-ddpautoencoder = DDPAutoEncoder(data_path,args.batch_size, args.learning_rate)
-trainer = Trainer(max_epochs=args.num_epochs, gpus=args.num_gpus, accelerator="ddp",logger = wandb_logger)
-trainer.fit(ddpautoencoder)
-trainer.save_checkpoint(os.path.join(args.model_path,'./ddpautoencoder.pth'))
+	#dataloader loading
+	dl = IsedolDataset(root = data_path, batchsize= args.batch_size)
+	dl.setup()
 
-#to onnx
-X = torch.tensor(np.zeros([128,3,680,720])).to(torch.float)
+	#setup model
+	ddpautoencoder = DDPAutoEncoder(root = data_path, lr = args.learning_rate)
+	
+	#setup trainer
+	trainer = Trainer(
+		max_epochs=args.num_epochs, 
+		gpus=args.num_gpus, 
+		accelerator="ddp",
+		plugins=DDPPlugin(find_unused_parameters=False),
+		logger = wandb_logger
+	)
 
-torch.onnx.export(ddpautoencoder,                     # model being run
-                  X,              # model input (or a tuple for multiple inputs)
-                  os.path.join(args.model_path,"ddpautoencoder.onnx"), # where to save the model (can be a file or file-like object)
-                  export_params=True,        # store the trained parameter weights inside the model file
-                  opset_version=10,          # the ONNX version to export the model to
-                  do_constant_folding=True,  # whether to execute constant folding for optimization
-                  input_names = ['input'],   # the model's input names
-                  output_names = ['output'], # the model's output names
-                  dynamic_axes={'input' : {0 : 'batch_size'},    # variable lenght axes
-                                'output' : {0 : 'batch_size'}})
+	#training
+	trainer.fit(ddpautoencoder, datamodule=dl)
+	trainer.save_checkpoint(os.path.join(args.model_path,'./ddpautoencoder.pth'))
+
+	#model to onnx
+	X = torch.tensor(np.zeros([128,3,680,720])).to(torch.float)
+	torch.onnx.export(ddpautoencoder,                     # model being run
+					X,              # model input (or a tuple for multiple inputs)
+					os.path.join(args.model_path,"ddpautoencoder.onnx"), # where to save the model (can be a file or file-like object)
+					export_params=True,        # store the trained parameter weights inside the model file
+					opset_version=10,          # the ONNX version to export the model to
+					do_constant_folding=True,  # whether to execute constant folding for optimization
+					input_names = ['input'],   # the model's input names
+					output_names = ['output'], # the model's output names
+					dynamic_axes={'input' : {0 : 'batch_size'},    # variable lenght axes
+									'output' : {0 : 'batch_size'}})

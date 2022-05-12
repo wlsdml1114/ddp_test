@@ -1,17 +1,13 @@
-import os
 import torch
 import torch.nn.functional as F
 import pytorch_lightning as pl
 from torch import nn
-from torchvision.datasets import ImageFolder
-from torchvision import transforms
 
 class DDPAutoEncoder(pl.LightningModule):
 
-    def __init__(self, root=None, batchsize=16,lr = 1e-3):
+    def __init__(self, root=None, lr = 1e-3):
         super().__init__()
         self.root = root
-        self.batchsize = batchsize
         self.lr = lr
         self.loss = F.mse_loss
         self.encoder = nn.Sequential(
@@ -64,17 +60,3 @@ class DDPAutoEncoder(pl.LightningModule):
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.lr)
         return optimizer
-
-    def setup(self, stage):
-        data_transform = transforms.Compose([
-            transforms.ToTensor()
-        ])
-        self.train_data = ImageFolder(self.root,transform=data_transform)
-        self.val_data = ImageFolder(self.root,transform=data_transform)
-        print('dataset length :', len(self.train_data))
-
-    def train_dataloader(self):
-        return torch.utils.data.DataLoader(self.train_data,batch_size = self.batchsize,num_workers=24)
-    
-    def val_dataloader(self):
-        return torch.utils.data.DataLoader(self.val_data,batch_size = self.batchsize,num_workers=24)

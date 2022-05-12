@@ -1,21 +1,26 @@
-import os
 import pytorch_lightning as pl
 import torch
+from typing import Optional
 from torchvision.datasets import ImageFolder
+from torchvision import transforms
 
 class IsedolDataset(pl.LightningDataModule):
-    def __init__(self, root, batchsize = 16, num=0):
+    def __init__(self, root, batchsize = 16,num_workers=24):
+        super().__init__()
         self.root = root
         self.batchsize = batchsize
+        self.num_workers = num_workers
 
-    def prepare_data(self):
-        return super().prepare_data()
-
-    def setup(self, stage):
-        self.train_data = ImageFolder(os.path.join(self.root,'Images'))
-        self.val_data = ImageFolder(os.path.join(self.root,'Images'))
+    def setup(self, stage: Optional[str] = None):
+        data_transform = transforms.Compose([
+            transforms.ToTensor()
+        ])
+        self.train_data = ImageFolder(self.root,transform=data_transform)
+        self.val_data = ImageFolder(self.root,transform=data_transform)
+        print('dataset length :', len(self.train_data))
 
     def train_dataloader(self):
-        return torch.utils.data.DataLoader(self.train_data,batch_size = self.batchsize)
+        return torch.utils.data.DataLoader(self.train_data,batch_size = self.batchsize,num_workers=self.num_workers)
+    
     def val_dataloader(self):
-        return torch.utils.data.DataLoader(self.val_data,batch_size = self.batchsize)
+        return torch.utils.data.DataLoader(self.val_data,batch_size = self.batchsize,num_workers=self.num_workers)

@@ -20,7 +20,7 @@ def get_args():
 args = get_args()
 
 #set root
-data_path = os.path.join(args.data_path,args.name,'1')
+data_path = os.path.join(args.data_path,args.name)
 
 #model loading
 

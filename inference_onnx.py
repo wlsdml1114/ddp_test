@@ -20,7 +20,7 @@ def get_args():
 args = get_args()
 
 #set root
-data_path = os.path.join(args.data_path,args.name,'1')
+data_path = os.path.join(args.data_path,args.name)
 
 #model loading
 session = onnxruntime.InferenceSession(os.path.join(args.model_path,'ddpautoencoder.onnx'),providers=['TensorrtExecutionProvider', 'CUDAExecutionProvider', 'CPUExecutionProvider'])
