@@ -71,6 +71,7 @@ class DDPAutoEncoder(pl.LightningModule):
         ])
         self.train_data = ImageFolder(self.root,transform=data_transform)
         self.val_data = ImageFolder(self.root,transform=data_transform)
+        print('dataset length :', len(self.train_data))
 
     def train_dataloader(self):
         return torch.utils.data.DataLoader(self.train_data,batch_size = self.batchsize,num_workers=24)

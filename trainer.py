@@ -27,14 +27,14 @@ args = get_args()
 print(args)
 
 #set root
-data_path = os.path.join(args.data_path,args.name)
+data_path = os.path.join(args.data_path,args.name,'1')
 
 #set logger
 wandb_logger = WandbLogger(project="multi-GPU", entity="engui")
 wandb_logger.config = args
 
 #training
-ddpautoencoder = DDPAutoEncoder(data_path,args.batch_size)
+ddpautoencoder = DDPAutoEncoder(data_path,args.batch_size, args.learning_rate)
 trainer = Trainer(max_epochs=args.num_epochs, gpus=args.num_gpus, accelerator="ddp",logger = wandb_logger)
 trainer.fit(ddpautoencoder)
 trainer.save_checkpoint(os.path.join(args.model_path,'./ddpautoencoder.pth'))
