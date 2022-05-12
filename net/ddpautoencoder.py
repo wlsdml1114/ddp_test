@@ -8,7 +8,7 @@ from torchvision import transforms
 
 class DDPAutoEncoder(pl.LightningModule):
 
-    def __init__(self, root, batchsize=16,lr = 1e-3):
+    def __init__(self, root=None, batchsize=16,lr = 1e-3):
         super().__init__()
         self.root = root
         self.batchsize = batchsize
