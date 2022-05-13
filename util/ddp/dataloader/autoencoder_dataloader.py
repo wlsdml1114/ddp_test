@@ -10,7 +10,7 @@ class AutoEncoderDataLoader(pl.LightningDataModule):
         self.root = root
         self.batchsize = batchsize
         self.num_workers = num_workers
-
+        
     def setup(self, stage: Optional[str] = None):
         data_transform = transforms.Compose([
             transforms.ToTensor()

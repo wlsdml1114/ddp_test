@@ -4,7 +4,9 @@ import torch
 import os
 import numpy as np
 import argparse
-from net.ddpautoencoder import DDPAutoEncoder
+import time
+from tqdm import tqdm
+from net.ddp.autoencoder import AutoEncoder
 
 
 def get_args():
@@ -23,14 +25,20 @@ args = get_args()
 data_path = os.path.join(args.data_path,args.name)
 
 #model loading
-
-model = DDPAutoEncoder()
+model = AutoEncoder()
 model.load_from_checkpoint(os.path.join(args.model_path,'ddpautoencoder.pth'))
+model.eval()
+model.cuda()
 
 #onnx input setting
-X = torch.tensor(np.zeros([2,3,680,720]).astype(np.float32))
+X = torch.tensor(np.zeros([128,3,680,720]).astype(np.float32)).cuda()
+
+# time count
+start = time.time()
 
 #run
-results = model(X)
+for i in tqdm(range(100)):
+	results = model(X)
 
-print(results)
+# time count
+print('time : ',time.time() - start)

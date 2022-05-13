@@ -1,10 +1,11 @@
 import warnings
 warnings.filterwarnings(action='ignore') 
-import torch
 import os
 import numpy as np
 import argparse
 import onnxruntime
+import time
+from tqdm import tqdm
 
 
 def get_args():
@@ -23,13 +24,18 @@ args = get_args()
 data_path = os.path.join(args.data_path,args.name)
 
 #model loading
-session = onnxruntime.InferenceSession(os.path.join(args.model_path,'ddpautoencoder.onnx'),providers=['TensorrtExecutionProvider', 'CUDAExecutionProvider', 'CPUExecutionProvider'])
+session = onnxruntime.InferenceSession(os.path.join(args.model_path,'ddpautoencoder.onnx'),providers=['CUDAExecutionProvider'])
 session.get_modelmeta()
 
 #onnx input setting
-X = np.zeros([2,3,680,720]).astype(np.float32)
+X = np.zeros([128,3,680,720]).astype(np.float32)
+
+# time count
+start = time.time()
 
 #run
-results = session.run([], {"input": X})
+for i in tqdm(range(100)):
+	results = session.run([], {"input": X})
 
-print(results)
+#time count
+print('time : ',time.time() - start)
