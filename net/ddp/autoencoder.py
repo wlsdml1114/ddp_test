@@ -3,7 +3,7 @@ import torch.nn.functional as F
 import pytorch_lightning as pl
 from torch import nn
 
-class DDPAutoEncoder(pl.LightningModule):
+class AutoEncoder(pl.LightningModule):
 
     def __init__(self, root=None, lr = 1e-3):
         super().__init__()

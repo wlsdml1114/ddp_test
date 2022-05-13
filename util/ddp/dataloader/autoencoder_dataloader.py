@@ -4,7 +4,7 @@ from typing import Optional
 from torchvision.datasets import ImageFolder
 from torchvision import transforms
 
-class IsedolDataset(pl.LightningDataModule):
+class AutoEncoderDataLoader(pl.LightningDataModule):
     def __init__(self, root, batchsize = 16,num_workers=24):
         super().__init__()
         self.root = root

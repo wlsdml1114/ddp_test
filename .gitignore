@@ -1,4 +1,5 @@
 dataset/
 model/
 wandb/
+nohup.out
 lightning_logs/

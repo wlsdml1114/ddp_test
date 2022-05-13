@@ -1,8 +1,8 @@
 import warnings
 warnings.filterwarnings(action='ignore') 
 from pytorch_lightning import Trainer
-from net.ddpautoencoder import DDPAutoEncoder
-from util.isedoldataset import IsedolDataset
+from net.ddp.autoencoder import AutoEncoder
+from util.ddp.dataloader.autoencoder_dataloader import AutoEncoderDataLoader
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.plugins import DDPPlugin
 import torch
@@ -37,11 +37,11 @@ if __name__ == "__main__":
 	wandb_logger.config = args
 
 	#dataloader loading
-	dl = IsedolDataset(root = data_path, batchsize= args.batch_size)
+	dl = AutoEncoderDataLoader(root = data_path, batchsize= args.batch_size)
 	dl.setup()
 
 	#setup model
-	ddpautoencoder = DDPAutoEncoder(root = data_path, lr = args.learning_rate)
+	ddpautoencoder = AutoEncoder(root = data_path, lr = args.learning_rate)
 	
 	#setup trainer
 	trainer = Trainer(

@@ -1,10 +1,10 @@
-from util.isedoldataset import IsedolDataset
+from util.ddp.dataloader.autoencoder_dataloader import AutoEncoderDataLoader
 import os
 
 
 data_path = os.path.join('/home/ubuntu/jini1114/dataset/','viichan')
 
-dl = IsedolDataset(root = data_path, batchsize=128)
+dl = AutoEncoderDataLoader(root = data_path, batchsize=128)
 dl.setup()
 
 for batch in dl.train_dataloader():
