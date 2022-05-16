@@ -1,5 +1,5 @@
-from util.ddp.dataloader.autoencoder_dataloader import AutoEncoderDataLoader
 import os
+from util.ddp.dataloader.autoencoder_dataloader import AutoEncoderDataLoader
 
 
 data_path = os.path.join('/home/ubuntu/jini1114/dataset/','viichan')

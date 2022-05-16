@@ -1,10 +1,10 @@
 import warnings
 warnings.filterwarnings(action='ignore') 
 import os
-import numpy as np
 import argparse
 import onnxruntime
 import time
+import numpy as np
 from tqdm import tqdm
 
 

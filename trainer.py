@@ -1,14 +1,14 @@
 import warnings
 warnings.filterwarnings(action='ignore') 
+import torch
+import os
+import argparse
+import numpy as np
 from pytorch_lightning import Trainer
 from net.ddp.autoencoder import AutoEncoder
 from util.ddp.dataloader.autoencoder_dataloader import AutoEncoderDataLoader
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.plugins import DDPPlugin
-import torch
-import os
-import numpy as np
-import argparse
 
 
 def get_args():

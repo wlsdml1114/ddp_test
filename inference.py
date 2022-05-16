@@ -2,9 +2,9 @@ import warnings
 warnings.filterwarnings(action='ignore') 
 import torch
 import os
-import numpy as np
 import argparse
 import time
+import numpy as np
 from tqdm import tqdm
 from net.ddp.autoencoder import AutoEncoder
 

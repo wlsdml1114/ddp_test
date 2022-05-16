@@ -1,5 +1,5 @@
-import pytorch_lightning as pl
 import torch
+import pytorch_lightning as pl
 from typing import Optional
 from torchvision.datasets import ImageFolder
 from torchvision import transforms
