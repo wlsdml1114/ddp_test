@@ -13,9 +13,9 @@ from pytorch_lightning.plugins import DDPPlugin
 
 def get_args():
 	parser = argparse.ArgumentParser(description='Arguments for the testing purpose.')	
-	parser.add_argument('--batch_size', type=int, required=False, default=128)
+	parser.add_argument('--batch_size', type=int, required=False, default=32)
 	parser.add_argument('--num_gpus', type=int, required=False, default=3)
-	parser.add_argument('--num_epochs', type=int, required=False, default=10)
+	parser.add_argument('--num_epochs', type=int, required=False, default=2)
 	parser.add_argument('--learning_rate', type=int, required=False, default=1e-3)
 	parser.add_argument('--name', type=str, required=False, default='jururu')
 	parser.add_argument('--model_save', type=bool, required=False, default=True)
@@ -30,19 +30,16 @@ if __name__ == "__main__":
 	args = get_args()
 	print(args)
 
-	#set root
-	data_path = os.path.join(args.data_path,args.name)
-
 	#set logger
 	wandb_logger = WandbLogger(project="multi-gpu-maskrcnn")
 	wandb_logger.config = args
 
 	#dataloader loading
-	dl = MaskRCNNDataLoader(root = data_path,name = args.name, batchsize= args.batch_size)
+	dl = MaskRCNNDataLoader(root = args.data_path, name = args.name, batchsize= args.batch_size)
 	dl.setup()
 
 	#setup model
-	ddpmaskrcnn = MaskRCNN(lr = args.learning_rate)
+	ddpmaskrcnn = MaskRCNN(mode = 'train', lr = args.learning_rate)
 	
 	#setup trainer
 	trainer = Trainer(

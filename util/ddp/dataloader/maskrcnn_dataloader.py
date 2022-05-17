@@ -1,4 +1,5 @@
 import torch
+import os
 import pytorch_lightning as pl
 from ..dataset.maskrcnndataset import MaskRCNNDataset
 from torchvision.transforms import functional as F
@@ -37,9 +38,15 @@ class MaskRCNNDataLoader(pl.LightningDataModule):
         return Compose(transform)
 
     def setup(self, stage: Optional[str] = None):
-        self.train_data = MaskRCNNDataset(self.root,self.transform,self.name)
-        self.val_data = MaskRCNNDataset(self.root,self.transform,self.name)
+        '''
+        self.train_data = MaskRCNNDataset(os.path.join(self.root,self.name),self.transform,self.name)
+        self.val_data = MaskRCNNDataset(os.path.join(self.root,self.name),self.transform,self.name)
         print('dataset length :', len(self.train_data))
+        '''
+        maskrcnn_dataset = MaskRCNNDataset(os.path.join(self.root,self.name),self.transform,self.name)
+        train_size = int(0.8 * len(maskrcnn_dataset))
+        test_size = len(maskrcnn_dataset) - train_size
+        self.train_data, self.val_data = torch.utils.data.random_split(maskrcnn_dataset, [train_size, test_size])
 
     def train_dataloader(self):
         return torch.utils.data.DataLoader(self.train_data,batch_size = self.batchsize,num_workers=self.num_workers)
