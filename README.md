@@ -9,6 +9,7 @@
     - net/ddp/maskrcnn.py
     - util/ddp/dataset/maskrcnndataset.py
     - util/ddp/dataloader/maskrcnn_dataloader.py
+3. Attention or Transformer 모델 구현 예정..
 # MLOps
 - WandB 적용
   - 우선 log 및 multiple run간의 비교를 위해 적용
