@@ -42,7 +42,7 @@ if __name__ == "__main__":
 	dl.setup()
 
 	#setup model
-	ddpautoencoder = AutoEncoder(root = data_path, lr = args.learning_rate)
+	ddpautoencoder = AutoEncoder(lr = args.learning_rate)
 	
 	#setup trainer
 	trainer = Trainer(

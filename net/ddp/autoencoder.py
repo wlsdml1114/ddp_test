@@ -5,9 +5,8 @@ from torch import nn
 
 class AutoEncoder(pl.LightningModule):
 
-    def __init__(self, root=None, lr = 1e-3):
+    def __init__(self, lr = 1e-3):
         super().__init__()
-        self.root = root
         self.lr = lr
         self.loss = F.mse_loss
         self.encoder = nn.Sequential(

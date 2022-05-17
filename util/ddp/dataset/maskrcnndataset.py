@@ -3,7 +3,7 @@ import torch
 import cv2
 import numpy as np
 
-class IsedolDataset(object):
+class MaskRCNNDataset(object):
     def __init__(self, root, transforms,name, num=0):
         self.root = root
         self.transforms = transforms
@@ -15,10 +15,12 @@ class IsedolDataset(object):
         thrshold = 150
         img = cv2.imread(os.path.join(self.root,'Images',self.files[idx][:-3]+'jpg'))
         img = img.astype(np.float32)
+        img = cv2.resize(img, dsize=(580, 620))
         img = img/255
 
         mask = cv2.imread(os.path.join(self.root,'Masks',self.files[idx]))
         mask = mask[:,:,0]
+        mask = cv2.resize(mask, dsize=(580, 620))
         mask[mask <thrshold] = 0
         mask[mask >=thrshold] = 1
 
@@ -57,6 +59,7 @@ class IsedolDataset(object):
         target["iscrowd"] = iscrowd
 
         if self.transforms is not None:
+
             img, target = self.transforms(img, target)
 
         return img, target
