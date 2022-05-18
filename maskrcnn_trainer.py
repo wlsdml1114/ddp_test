@@ -55,10 +55,10 @@ if __name__ == "__main__":
 
 	if args.model_save :
 		print('training model save')
-		trainer.save_checkpoint(os.path.join(args.model_path,'./ddp_%s_maskrcnn.pth'%(args.name)))
+		trainer.save_checkpoint(os.path.join(args.model_path,'./ddp_%s_maskrcnn.pt'%(args.name)))
 
 		#model to onnx
-		X = torch.tensor(np.zeros([128,3,680,720])).to(torch.float)
+		X = torch.tensor(np.zeros([2,3,680,720])).to(torch.float)
 		torch.onnx.export(ddpmaskrcnn,                     # model being run
 						X,              # model input (or a tuple for multiple inputs)
 						os.path.join(args.model_path,"ddp_%s_maskrcnn.onnx"%(args.name)), # where to save the model (can be a file or file-like object)

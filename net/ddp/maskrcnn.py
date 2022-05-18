@@ -35,15 +35,9 @@ class MaskRCNN(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         self.model.train()
-        images,targets = batch
-        x = list(image for image in images)
-        y = []
-        for idx in range(len(x)):
-            dict = {}
-            for key in self.keys:
-                dict[key] = targets[key][idx]
-            y.append(dict)
-        #y = [{k: v for k, v in t.items()} for t in targets]
+
+        x,y = self.batch_reconstruction(batch)
+
         loss_dict = self.model(x,y)
 
         losses = sum(loss for loss in loss_dict.values())
@@ -55,25 +49,20 @@ class MaskRCNN(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         self.model.train()
-        images,targets = batch
-        x = list(image for image in images)
-        y = []
-        for idx in range(len(x)):
-            dict = {}
-            for key in self.keys:
-                dict[key] = targets[key][idx]
-            y.append(dict)
-        #y = [{k: v for k, v in t.items()} for t in targets]
+  
+        x,y = self.batch_reconstruction(batch)
+
         loss_dict = self.model(x,y)
+
         losses = sum(loss for loss in loss_dict.values())
+
+        loss_dict = {t:loss_dict[t].detach() for t in loss_dict}
 
         self.log("validation_loss", loss_dict, on_step=True, on_epoch=True, sync_dist=True)
         return losses
     def test_step(self, batch, batch_idx):
-        x,y = batch
-        images = x
-        target = y
-        loss_dict = self.model(batch)
+        x,y = self.batch_reconstruction(batch)
+        loss_dict = self.model(x,y)
         self.log("test_loss", loss_dict, on_step=True, on_epoch=True, sync_dist=True)
 
     def predict_step(self, batch, batch_idx, dataloader_idx=None):
@@ -84,13 +73,18 @@ class MaskRCNN(pl.LightningModule):
         params = [p for p in self.model.parameters() if p.requires_grad]
         optimizer = torch.optim.SGD(params, lr=self.lr,
                             momentum=0.9, weight_decay=0.0005)
-        return {
-            "optimizer": optimizer,
-            "lr_scheduler": {
-                "scheduler": torch.optim.lr_scheduler.StepLR(optimizer,
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer,
                                                         step_size=3,
-                                                        gamma=0.1),
-                "monitor": "metric_to_track",
-                "frequency": "indicates how often the metric is updated"
-            },
-        }
+                                                        gamma=0.1)
+        return [optimizer],[scheduler]
+
+    def batch_reconstruction(self, batch):
+        images,targets = batch
+        x = list(image for image in images)
+        y = []
+        for idx in range(len(x)):
+            dict = {}
+            for key in self.keys:
+                dict[key] = targets[key][idx]
+            y.append(dict)
+        return x, y
