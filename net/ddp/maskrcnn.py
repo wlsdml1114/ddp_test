@@ -1,7 +1,6 @@
 import torch
 import torchvision
 import pytorch_lightning as pl
-import torch.distributed as dist
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 
